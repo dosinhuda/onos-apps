@@ -1,13 +1,28 @@
 # onos-apps
 1. install following https://hackmd.io/p/SkMbGhel-#/3/8
-(run one time)
--> cd $onos
--> onos-buck-publish-local 
--> cd $onos/tools/package/archetypes
--> mvn clean install
--> cd ~/
-2. cd MyApps
+1.1. MACs-MacBook-Air-2:~ mac$ export JAVA_HOME=$(/usr/libexec/java_home -v 1.8)
+1.2. MACs-MacBook-Air-2:~ mac$ export ONOS_ROOT="/Users/$USER/onos"
+1.3. MACs-MacBook-Air-2:~ mac$ source $ONOS_ROOT/tools/dev/bash_profile
+1.4. MACs-MacBook-Air-2:~ mac$ . ~/.bash_profile
+1.5. cd $onos
+1.6. onos-buck-publish-local 
+1.7. cd onos/tools/package/archetypes
+1.8. mvn clean install
+1.9  cd ~/
+2. cd MyApps 
 3. onos-create-app
+3.1. Define value for property 'groupId': nctu.dosinhuda
+3.2. Define value for property 'artifactId': dosinhuda.non3GPP.app
+3.3. Define value for property 'version' 1.0-SNAPSHOT: : 1.10.0.rc2
+3.4. Define value for property 'package' nctu.dosinhuda: : nctu.dosinhuda.non3GPP
+3.5. MACs-MacBook-Air-2:MyApps mac$ cd dosinhuda.non3GPP.app/
+3.6. MACs-MacBook-Air-2:dosinhuda.non3GPP.app mac$ sudo gedit pom.xml 
+3.7. edit properties: <onos.app.name>nctu.dosinhuda.non3GPP.app</onos.app.name>
+3.8.  <onos.app.origin>non3GPP, Community.</onos.app.origin>
+3.9. mvn clean install
+3.10. MACs-MacBook-Air-2:dosinhuda.non3GPP.app mac$ onos-app 192.168.0.5 install target/dosinhuda.non3GPP.app-1.10.0.rc2.oar
+3.11. Edit program and rebuit: MACs-MacBook-Air-2:dosinhuda.non3GPP.app mac$ mvn clean install
+3.12. MACs-MacBook-Air-2:dosinhuda.non3GPP.app mac$ onos-app 192.168.0.5 reinstall nctu.dosinhuda.non3GPP.app target/dosinhuda.non3GPP.app-1.10.0.rc2.oar 
 4. run IJ (download and install: https://www.jetbrains.com/idea/download/#section=mac)
 5. Import project: MyApps/[Folder]/pom.xlm
 and modify to creat file .oar later:  
