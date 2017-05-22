@@ -29,5 +29,6 @@ and modify to creat file .oar later:
 12. To check: onos>apps -s
 13. onos>apps
 14. onos>apps -s -a
+15. From MAC: MACs-MacBook-Air-2:dosinhuda_non3GPP.app mac$ mci && onos-app 192.168.156.117 reinstall NCTU.dosinhuda.app target/dosinhuda_non3GPP.app-1.0-SNAPSHOT.oar
 
 
