@@ -30,6 +30,6 @@ and modify to creat file .oar later:
 13. onos>apps
 14. onos>apps -s -a
 15. From MAC: MACs-MacBook-Air-2:dosinhuda_non3GPP.app mac$ mci && onos-app 192.168.156.117 reinstall NCTU.dosinhuda.app target/dosinhuda_non3GPP.app-1.0-SNAPSHOT.oar
-16. Run onos on MAC: MACs-MacBook-Air-2:bin mac$ cd onos/tools/package/bin/
+16. Run onos on MAC: MACs-MacBook-Air-2:~ mac$ cd Applications/onos-1.10.0-rc2/bin/
 17. sudo ./onos-service
 
