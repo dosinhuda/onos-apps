@@ -7,7 +7,7 @@
 6. cd $onos
 7. onos-buck-publish-local 
 8. cd onos/tools/package/archetypes
-9. mvn clean install
+9. mvn clean install -DskipTests
 10.  cd ~/
 11. cd MyApps 
 12. onos-create-app
@@ -19,7 +19,7 @@
 18. MACs-MacBook-Air-2:dosinhuda.non3GPP.app mac$ sudo gedit pom.xml 
 19. edit properties: <onos.app.name>nctu.dosinhuda.non3GPP.app</onos.app.name>
 20.  <onos.app.origin>non3GPP, Community.</onos.app.origin>
-21. mvn clean install
+21. mvn clean install -DskipTests
 22. MACs-MacBook-Air-2:dosinhuda.non3GPP.app mac$ onos-app 192.168.0.5 install target/dosinhuda.non3GPP.app-1.10.0.rc2.oar
 23. Edit program and rebuit: MACs-MacBook-Air-2:dosinhuda.non3GPP.app mac$ mvn clean install
 24. MACs-MacBook-Air-2:dosinhuda.non3GPP.app mac$ onos-app 192.168.0.5 reinstall nctu.dosinhuda.non3GPP.app target/dosinhuda.non3GPP.app-1.10.0.rc2.oar 
