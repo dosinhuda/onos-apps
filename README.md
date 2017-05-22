@@ -24,4 +24,11 @@ and modify to creat file .oar later:
 -> onos-app localhost install target/[file].oar
 9. Only if reinstall needed
 -> onos-app localhost reinstall nctu.dosinhuda1.app target/[file].oar
+ex:sdn@sdn:~/onos/tools/package/archetypes/non3GPP_RAN-app$ onos-app 192.168.156.117 install target/non3GPP_RAN-app-1.10.0-SNAPSHOT.oar
+sdn@sdn:~/onos/tools/package/archetypes/non3GPP_RAN-app$ onos-app 192.168.156.117 reinstall org.non3GPP_RAN.app target/non3GPP_RAN-app-1.10.0-SNAPSHOT.oar
+10. To check: 
+onos>apps -s
+onos>apps
+onos>apps -s -a
+
 
