@@ -20,9 +20,9 @@
 19. edit properties: <onos.app.name>nctu.dosinhuda.non3GPP.app</onos.app.name>
 20.  <onos.app.origin>non3GPP, Community.</onos.app.origin>
 21. mvn clean install -DskipTests
-22. MACs-MacBook-Air-2:dosinhuda.non3GPP.app mac$ onos-app 192.168.0.5 install target/dosinhuda.non3GPP.app-1.10.0.rc2.oar
+22. MACs-MacBook-Air-2:dosinhuda.non3GPP.app mac$ onos-app 192.168.0.5 install target/dosinhuda.non3GPP.app-1.10.0.rc2.oar (or install! to activate)
 23. Edit program and rebuit: MACs-MacBook-Air-2:dosinhuda.non3GPP.app mac$ mvn clean install
-24. MACs-MacBook-Air-2:dosinhuda.non3GPP.app mac$ onos-app 192.168.0.5 reinstall nctu.dosinhuda.non3GPP.app target/dosinhuda.non3GPP.app-1.10.0.rc2.oar 
+24. MACs-MacBook-Air-2:dosinhuda.non3GPP.app mac$ onos-app 192.168.0.5 reinstall nctu.dosinhuda.non3GPP.app target/dosinhuda.non3GPP.app-1.10.0.rc2.oar (or reinstall! to activate)
 25. run IJ (download and install: https://www.jetbrains.com/idea/download/#section=mac)
 26. Import project: MyApps/[Folder]/pom.xlm
 27. File --> Import Setting: onos/tools/dev/idea-setting.jar
