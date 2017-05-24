@@ -39,3 +39,4 @@
 38. onos> apps | grep ARP
 39. onos> log:display
 40. onos> flows | grep Count
+41. onos> roles
