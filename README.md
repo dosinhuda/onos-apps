@@ -35,3 +35,5 @@
 34. onos> masters
 35. nos> flows | grep ICMP
 36. nos> flows | grep ARP
+37. onos> apps | grep ICMP
+38. onos> apps | grep ARP
