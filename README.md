@@ -31,3 +31,4 @@
 30. Run onos on MAC: MACs-MacBook-Air-2:~ mac$ cd Applications/onos-1.10.0-rc2/bin/
 31. sudo ./onos-service
 32. onos>flows : to check flows added to switch from apps
+33. onos>summary
