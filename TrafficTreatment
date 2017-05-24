@@ -266,4 +266,33 @@ private void sendReply(PacketContext context,Ethernet reply){
   }
 }
  
+
+Example 15
+---------
+VLAN ID
+  private void installDefaultRule(PacketContext context, PortNumber portNumber){
+            Ethernet inPkt = context.inPacket().parsed();
+       
+            TrafficSelector.Builder selectorBuilder = DefaultTrafficSelector.builder()
+                        .matchInPort(context.inPacket().receivedFrom().port())
+                        .matchVlanId(VlanId.vlanId(inPkt.getVlanID()))
+                        .matchEthType(Ethernet.TYPE_IPV4);
+
  
+            TrafficTreatment treatment = DefaultTrafficTreatment.builder()
+                .setOutput(portNumber)
+                .setVlanId(VlanId.vlanId(VlanN)) // VlanN is a different VLANid
+                .build();
+
+            ForwardingObjective forwardingObjective = DefaultForwardingObjective.builder()
+                .withSelector(selectorBuilder.build())
+                .withTreatment(treatment)
+                .withPriority(defaultPriority)
+                .withFlag(ForwardingObjective.Flag.VERSATILE)
+                .fromApp(appId)
+                .makePermanent()
+                .add();
+
+        flowObjectiveService.forward(context.inPacket().receivedFrom().deviceId(),
+                                    forwardingObjective);
+                                    
