@@ -1,0 +1,11 @@
+Java Code Examples for org.onosproject.net.flow.TrafficTreatment
+==============================================================
+Example 1
+---------
+private void forwardPacketToDst(PacketContext context,Host dst){
+  TrafficTreatment treatment=DefaultTrafficTreatment.builder().setOutput(dst.location().port()).build();
+  OutboundPacket packet=new DefaultOutboundPacket(dst.location().deviceId(),treatment,context.inPacket().unparsed());
+  packetService.emit(packet);
+  log.info("sending packet: {}",packet);
+}
+ 
