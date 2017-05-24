@@ -32,3 +32,4 @@
 31. sudo ./onos-service
 32. onos>flows : to check flows added to switch from apps
 33. onos>summary
+34. onos> masters
