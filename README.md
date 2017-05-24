@@ -33,3 +33,5 @@
 32. onos>flows : to check flows added to switch from apps
 33. onos>summary
 34. onos> masters
+35. nos> flows | grep ICMP
+36. nos> flows | grep ARP
