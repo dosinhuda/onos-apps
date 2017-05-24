@@ -37,3 +37,4 @@
 36. nos> flows | grep ARP
 37. onos> apps | grep ICMP
 38. onos> apps | grep ARP
+39. onos> log:display
