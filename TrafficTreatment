@@ -2,10 +2,268 @@ Java Code Examples for org.onosproject.net.flow.TrafficTreatment
 ==============================================================
 Example 1
 ---------
+Project: onos-app-   File: IntentReactiveForwarding.java
+
 private void forwardPacketToDst(PacketContext context,Host dst){
   TrafficTreatment treatment=DefaultTrafficTreatment.builder().setOutput(dst.location().port()).build();
   OutboundPacket packet=new DefaultOutboundPacket(dst.location().deviceId(),treatment,context.inPacket().unparsed());
   packetService.emit(packet);
   log.info("sending packet: {}",packet);
 }
+
+Example 2
+--------- 
+Project: onos-app-   File: McastForwarding.java
+/** 
+ * Forward the packet to it's multicast destinations.
+ * @param context The packet context
+ * @param entry The multicast route entry matching this packet
+ */
+private void forwardPacketToDst(PacketContext context,McastRoute entry){
+  for (  ConnectPoint egress : entry.getEgressPoints()) {
+    TrafficTreatment treatment=DefaultTrafficTreatment.builder().setOutput(egress.port()).build();
+    OutboundPacket packet=new DefaultOutboundPacket(egress.deviceId(),treatment,context.inPacket().unparsed());
+    packetService.emit(packet);
+  }
+}
+
+Example 3 
+---------
+Project: onos-app-   File: McastIntentManager.java
+/** 
+ * Install the PointToMultipoint forwarding intent.
+ * @param mroute multicast route entry
+ * @return the intent that has been set or null otherwise
+ */
+public SinglePointToMultiPointIntent setIntent(McastRoute mroute){
+  TrafficSelector.Builder selector=DefaultTrafficSelector.builder();
+  TrafficTreatment treatment=DefaultTrafficTreatment.emptyTreatment();
+  if (mroute.getIngressPoint() == null || mroute.getEgressPoints().isEmpty()) {
+    return null;
+  }
+  selector.matchEthType(Ethernet.TYPE_IPV4).matchIPDst(mroute.getGaddr()).matchIPSrc(mroute.getSaddr());
+  SinglePointToMultiPointIntent intent=SinglePointToMultiPointIntent.builder().appId(McastForwarding.getAppId()).selector(selector.build()).treatment(treatment).ingressPoint(mroute.getIngressPoint()).egressPoints(mroute.getEgressPoints()).build();
+  intentService.submit(intent);
+  return intent;
+}
+ 
+Example 4
+---------
+Project:    File: AddPointToPointIntentCommand.java
+@Override protected void execute(){
+  IntentService service=get(IntentService.class);
+  ConnectPoint ingress=ConnectPoint.deviceConnectPoint(ingressDeviceString);
+  ConnectPoint egress=ConnectPoint.deviceConnectPoint(egressDeviceString);
+  TrafficSelector selector=buildTrafficSelector();
+  TrafficTreatment treatment=buildTrafficTreatment();
+  List<Constraint> constraints=buildConstraints();
+  Intent intent=PointToPointIntent.builder().appId(appId()).key(key()).selector(selector).treatment(treatment).ingressPoint(ingress).egressPoint(egress).constraints(constraints).priority(priority()).build();
+  service.submit(intent);
+  print("Point to point intent submitted:\n%s",intent.toString());
+}
+ 
+
+Example 5
+---------
+Project:    File: IntentPushTestCommand.java
+private List<Intent> generateIntents(ConnectPoint ingress,ConnectPoint egress){
+  TrafficSelector.Builder selectorBldr=DefaultTrafficSelector.builder().matchEthType(Ethernet.TYPE_IPV4);
+  TrafficTreatment treatment=DefaultTrafficTreatment.emptyTreatment();
+  List<Intent> intents=Lists.newArrayList();
+  for (int i=0; i < count; i++) {
+    TrafficSelector selector=selectorBldr.matchEthSrc(MacAddress.valueOf(i + keyOffset)).build();
+    intents.add(PointToPointIntent.builder().appId(appId()).key(Key.of(i + keyOffset,appId())).selector(selector).treatment(treatment).ingressPoint(ingress).egressPoint(egress).build());
+  }
+  return intents;
+}
+ 
+
+Example 6
+---------
+Project:    File: IntentCycleCommand.java
+
+
+private List<Intent> generateIntents(ConnectPoint ingress,ConnectPoint egress){
+  TrafficSelector.Builder selectorBldr=DefaultTrafficSelector.builder().matchEthType(Ethernet.TYPE_IPV4);
+  TrafficTreatment treatment=DefaultTrafficTreatment.emptyTreatment();
+  List<Intent> intents=Lists.newArrayList();
+  for (int i=0; i < count; i++) {
+    TrafficSelector selector=selectorBldr.matchEthSrc(MacAddress.valueOf(i + keyOffset)).build();
+    intents.add(PointToPointIntent.builder().appId(appId()).key(Key.of(i + keyOffset,appId())).selector(selector).treatment(treatment).ingressPoint(ingress).egressPoint(egress).build());
+  }
+  return intents;
+}
+ 
+
+Example 7
+---------
+Project:    File: AddHostToHostIntentCommand.java
+@Override protected void execute(){
+  IntentService service=get(IntentService.class);
+  HostId oneId=HostId.hostId(one);
+  HostId twoId=HostId.hostId(two);
+  TrafficSelector selector=buildTrafficSelector();
+  TrafficTreatment treatment=buildTrafficTreatment();
+  List<Constraint> constraints=buildConstraints();
+  HostToHostIntent intent=HostToHostIntent.builder().appId(appId()).key(key()).one(oneId).two(twoId).selector(selector).treatment(treatment).constraints(constraints).priority(priority()).build();
+  service.submit(intent);
+  print("Host to Host intent submitted:\n%s",intent.toString());
+}
+ 
+
+Example 8
+---------
+Project:    File: OLT.java
+private void provisionVlanOnPort(String deviceId,int uplinkPort,PortNumber p,short vlanId){
+  DeviceId did=DeviceId.deviceId(deviceId);
+  TrafficSelector upstream=DefaultTrafficSelector.builder().matchVlanId(VlanId.vlanId(vlanId)).matchInPort(p).build();
+  TrafficSelector downStream=DefaultTrafficSelector.builder().matchVlanId(VlanId.vlanId(vlanId)).matchInPort(PortNumber.portNumber(uplinkPort)).build();
+  TrafficTreatment upstreamTreatment=DefaultTrafficTreatment.builder().setOutput(PortNumber.portNumber(uplinkPort)).build();
+  TrafficTreatment downStreamTreatment=DefaultTrafficTreatment.builder().setOutput(p).build();
+  ForwardingObjective upFwd=DefaultForwardingObjective.builder().withFlag(ForwardingObjective.Flag.VERSATILE).withPriority(1000).makePermanent().withSelector(upstream).fromApp(appId).withTreatment(upstreamTreatment).add();
+  ForwardingObjective downFwd=DefaultForwardingObjective.builder().withFlag(ForwardingObjective.Flag.VERSATILE).withPriority(1000).makePermanent().withSelector(downStream).fromApp(appId).withTreatment(downStreamTreatment).add();
+  flowObjectiveService.forward(did,upFwd);
+  flowObjectiveService.forward(did,downFwd);
+}
+ 
+
+Example 9
+---------
+Project:    File: CordFabricManager.java
+
+
+private void provisionIPTV(){
+  TrafficSelector ipTvUp=DefaultTrafficSelector.builder().matchVlanId(VlanId.vlanId((short)7)).matchInPort(PortNumber.portNumber(2)).build();
+  TrafficTreatment ipTvActUp=DefaultTrafficTreatment.builder().setOutput(PortNumber.portNumber(7)).build();
+  TrafficSelector ipTvDown=DefaultTrafficSelector.builder().matchVlanId(VlanId.vlanId((short)7)).matchInPort(PortNumber.portNumber(7)).build();
+  TrafficTreatment ipTvActDown=DefaultTrafficTreatment.builder().setOutput(PortNumber.portNumber(2)).build();
+  ForwardingObjective ipTvUpstream=DefaultForwardingObjective.builder().fromApp(appId).makePermanent().withFlag(ForwardingObjective.Flag.VERSATILE).withPriority(PRIORITY).withSelector(ipTvUp).withTreatment(ipTvActUp).add();
+  ForwardingObjective ipTvDownstream=DefaultForwardingObjective.builder().fromApp(appId).makePermanent().withFlag(ForwardingObjective.Flag.VERSATILE).withPriority(PRIORITY).withSelector(ipTvDown).withTreatment(ipTvActDown).add();
+  flowObjectiveService.forward(fabricDeviceId,ipTvUpstream);
+  flowObjectiveService.forward(fabricDeviceId,ipTvDownstream);
+}
+ 
+
+Example 10
+---------
+Project:    File: VTNManager.java
+private void programLocalOut(DeviceId dpid,SegmentationId segmentationId,PortNumber outPort,MacAddress sourceMac,ApplicationId appid,Objective.Operation type){
+  TrafficSelector selector=DefaultTrafficSelector.builder().matchEthDst(sourceMac).build();
+  TrafficTreatment treatment=DefaultTrafficTreatment.builder().add(Instructions.modTunnelId(Long.parseLong(segmentationId.toString()))).setOutput(outPort).build();
+  ForwardingObjective.Builder objective=DefaultForwardingObjective.builder().withTreatment(treatment).withSelector(selector).fromApp(appId).withFlag(Flag.SPECIFIC).withPriority(MAC_PRIORITY);
+  if (type.equals(Objective.Operation.ADD)) {
+    flowObjectiveService.forward(dpid,objective.add());
+  }
+ else {
+    flowObjectiveService.forward(dpid,objective.remove());
+  }
+}
+ 
+
+Example 11
+---------
+Project: onos-app-   File: BandwidthCalendarResource.java
+/** 
+ * Create an Intent for a bidirectional path with constraints.
+ * @param key optional intent key
+ * @param src the path source (DPID or hostID)
+ * @param dst the path destination (DPID or hostID)
+ * @param srcPort the source port (-1 if src/dest is a host)
+ * @param dstPort the destination port (-1 if src/dest is a host)
+ * @param bandwidth the bandwidth (mbps) requirement for the path
+ * @param latency the latency (micro sec) requirement for the path
+ * @return the appropriate intent
+ */
+private Intent createIntent(Key key,String src,String dst,String srcPort,String dstPort,Long bandwidth,Long latency){
+  TrafficSelector selector=buildTrafficSelector();
+  TrafficTreatment treatment=builder().build();
+  final Constraint constraintBandwidth=new BandwidthConstraint(new BandwidthResource(Bandwidth.mbps(bandwidth)));
+  final Constraint constraintLatency=new LatencyConstraint(Duration.of(latency,ChronoUnit.MICROS));
+  final List<Constraint> constraints=new LinkedList<>();
+  constraints.add(constraintBandwidth);
+  constraints.add(constraintLatency);
+  if (srcPort.equals("-1")) {
+    HostId srcPoint=HostId.hostId(src);
+    HostId dstPoint=HostId.hostId(dst);
+    return HostToHostIntent.builder().appId(appId()).key(key).one(srcPoint).two(dstPoint).selector(selector).treatment(treatment).constraints(constraints).build();
+  }
+ else {
+    ConnectPoint srcPoint=new ConnectPoint(deviceId(src),portNumber(srcPort));
+    ConnectPoint dstPoint=new ConnectPoint(deviceId(dst),portNumber(dstPort));
+    return TwoWayP2PIntent.builder().appId(appId()).key(key).one(srcPoint).two(dstPoint).selector(selector).treatment(treatment).constraints(constraints).build();
+  }
+}
+
+Example 12
+---------
+Project: onos-app-   File: IntentReactiveForwarding.java
+private void setUpConnectivity(PacketContext context,HostId srcId,HostId dstId){
+  TrafficSelector selector=DefaultTrafficSelector.emptySelector();
+  TrafficTreatment treatment=DefaultTrafficTreatment.emptyTreatment();
+  Key key;
+  if (srcId.toString().compareTo(dstId.toString()) < 0) {
+    key=Key.of(srcId.toString() + dstId.toString(),appId);
+  }
+ else {
+    key=Key.of(dstId.toString() + srcId.toString(),appId);
+  }
+  HostToHostIntent intent=(HostToHostIntent)intentService.getIntent(key);
+  if (intent != null) {
+    if (WITHDRAWN_STATES.contains(intentService.getIntentState(key))) {
+      HostToHostIntent hostIntent=HostToHostIntent.builder().appId(appId).key(key).one(srcId).two(dstId).selector(selector).treatment(treatment).build();
+      intentService.submit(hostIntent);
+    }
+ else     if (intentService.getIntentState(key) == IntentState.FAILED) {
+      TrafficSelector objectiveSelector=DefaultTrafficSelector.builder().matchEthSrc(srcId.mac()).matchEthDst(dstId.mac()).build();
+      TrafficTreatment dropTreatment=DefaultTrafficTreatment.builder().drop().build();
+      ForwardingObjective objective=DefaultForwardingObjective.builder().withSelector(objectiveSelector).withTreatment(dropTreatment).fromApp(appId).withPriority(intent.priority() - 1).makeTemporary(DROP_RULE_TIMEOUT).withFlag(ForwardingObjective.Flag.VERSATILE).add();
+      flowObjectiveService.forward(context.outPacket().sendThrough(),objective);
+    }
+  }
+ else   if (intent == null) {
+    HostToHostIntent hostIntent=HostToHostIntent.builder().appId(appId).key(key).one(srcId).two(dstId).selector(selector).treatment(treatment).build();
+    intentService.submit(hostIntent);
+  }
+}
+ 
+
+Example 13
+---------
+Project: Distributed-ONOS-Appl   File: NetworkManager.java
+private Set<Intent> addToMesh(HostId src,Set<HostId> existing){
+  if (existing.isEmpty()) {
+    return Collections.emptySet();
+  }
+  Set<Intent> submitted=new HashSet<>();
+  existing.forEach(dst -> {
+    if (!src.equals(dst)) {
+      TrafficSelector selector=DefaultTrafficSelector.emptySelector();
+      TrafficTreatment treatment=DefaultTrafficTreatment.emptyTreatment();
+      Intent intent=new HostToHostIntent(appId,src,dst,selector,treatment);
+      submitted.add(intent);
+      intentService.submit(intent);
+    }
+  }
+);
+  return submitted;
+}
+ 
+
+Example 14
+---------
+Project: onos-app-   File: DHCPManager.java
+/** 
+ * Sends the Ethernet reply frame via the Packet Service.
+ * @param context the context of the incoming frame
+ * @param reply the Ethernet reply frame
+ */
+private void sendReply(PacketContext context,Ethernet reply){
+  if (reply != null) {
+    TrafficTreatment.Builder builder=DefaultTrafficTreatment.builder();
+    ConnectPoint sourcePoint=context.inPacket().receivedFrom();
+    builder.setOutput(sourcePoint.port());
+    packetService.emit(new DefaultOutboundPacket(sourcePoint.deviceId(),builder.build(),ByteBuffer.wrap(reply.serialize())));
+  }
+}
+ 
  
