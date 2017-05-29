@@ -4,6 +4,15 @@ https://github.com/opennetworkinglab/onos/blob/master/core/api/src/main/java/org
 https://github.com/opennetworkinglab/onos/blob/master/core/api/src/main/java/org/onosproject/net/flow/DefaultTrafficSelector.java
 https://github.com/opennetworkinglab/onos/blob/master/apps/fwd/src/main/java/org/onosproject/fwd/ReactiveForwarding.java
 ============================================================
+Fix maven lib:
+File->Project Structure->Libraries-> + -> Find  "onos-core-serializers"   
+Insert into pom.xml:
+    <dependency>
+            <groupId>org.onosproject</groupId>
+            <artifactId>onos-core-serializers</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+============================================================
 Example 1
 ---------
 Project: onos-app-   File: IntentReactiveForwarding.java
